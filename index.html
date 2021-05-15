@@ -1,93 +1,134 @@
 <!DOCTYPE html>
 <html>
 <head>
+
+<link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>
+
 <style>
+
+body {
+  font-family: 'Montserrat'; 
+}
+
+.header {
+  height: 140px;
+  border-bottom: #000 4px solid;
+  box-shadow: 0px 4px 10px 0px black;
+}
+
+.header > h1 {
+  font-size: 36px;
+  font-weight: bold;
+  padding: 48px;
+}
+
 .grid-container {
   display: grid;
   grid-template-columns:auto;
   grid-gap: 10px;
   background-color: #ffffff;
   padding: 10px;
+  margin-top: 50px;
 }
 
 .grid-container > div {
   text-align: center;
-  padding: 16px;
   font-size: 30px;
 }
 
 .container {
-display: grid;
-grid-template-columns: auto auto auto;
-grid-auto-rows: minmax(auto, auto);
-grid-gap: 80px;
+  display: grid;
+  grid-template-columns: auto auto auto;
+  grid-auto-rows: minmax(auto, auto);
+  grid-gap: 80px;
 }
 
 .container > div {
-border: #000 1px solid;
-padding: 16px;
-width: 368px;
+  width: 388px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px 0px black;
 }
 
 .heads {
-display: grid;
-grid-template-columns: auto auto auto;
-grid-auto-rows: minmax(70px, auto);
-grid-gap: 80px;
+  display: grid;
+  grid-template-columns: auto auto auto;
+  grid-auto-rows: minmax(70px, auto);
+  grid-gap: 80px;
 }
 
 .heads > div {
-border: #000 1px solid;
-padding: 16px;
-width: 368px;
+  height:62px;
+  width: 388px;
+  border-radius: 10px;
+  color: white;
+  font-size: 36px;
+  font-weight: bold;
+  box-shadow: 0px 4px 10px 0px black;
 }
 
 .cardlist {
   position: relative;
-  overflow-y: scroll;
-  max-height: 300px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: inherit;
+  max-height: 600px;
+  margin-bottom: 65px;
 }
 
 
 .backlog {
-  background-color: #ff0000;
+  position: relative;
+  background-color: #ADADAD;
   height: inherit;
   width: inherit;
 }
 
-.newticket {
-  position: absolute
+.backlog > .newticket {
+  position: absolute;
+  width: inherit;
+  left: 0px;
   bottom: 0px;
-  align: center;
   border: #000 0px solid;
   color: white;
-  background-color: #ff0000;
+  background-color: inherit;
   font-size: 30px;
+  border-radius: 10px;
 }
+
 .inprogress {
-  background-color: #808080;
+  position: relative;
+  background-color: #0066FF;
   height: inherit;
   width: inherit;
 }
 
 .complete {
-  background-color: #0000ff;
+  position: relative;
+  background-color: #008010;
   height: inherit;
   width: inherit;
 }
 
 .card {
-  border: #000 1px solid;
+  border: #000 0px solid;
   border-radius: 10px;
   background-color: #ffffff;
-  margin: 16px;
+  padding: 10px;
+  margin:16px;
+  margin-right:43px;
   height: 155px;
-  width: 330px;
+  width: 310px;
   position: relative;
 }
 
+.card:hover {
+  transform: scale(1.1);
+}
+
 .card > .description {
-  align:center;
+  align-self:center;
+  margin-top: 16px;
+  font-size: 30px;
 }
 
 .card > .moveright {
@@ -95,6 +136,11 @@ width: 368px;
   right: 16px;
   top: 75px;
   border-radius: 50%;
+  border: #000 2px solid;
+}
+
+.moveright:hover {
+  transform: scale(1.1);
 }
 
 .card > .moveleft {
@@ -102,34 +148,46 @@ width: 368px;
   left: 16px;
   top: 75px;
   border-radius: 50%;
+  border: #000 2px solid;
+}
+
+.moveleft:hover {
+  transform: scale(1.1);
+}
+
+.card > p {
+  margin: 0px;
+  font-size: 18px;
 }
 
 .card > .user {
   position: absolute;
   bottom: 8px;
   right: 16px;
-  font-size: 18px;
 }
 
 .card > .date {
   position: absolute;
   bottom: 8px;
   left: 16px;
-  font-size: 18px;
 }
 
 .card > .bottomright {
   position: absolute;
   bottom: 8px;
   right: 16px;
-  font-size: 18px;
 }
 
 .card > .bottomleft {
   position: absolute;
   bottom: 8px;
   left: 16px;
-  font-size: 18px;
+}
+
+.card > textarea {
+  border-color: white;
+  margin-top: 16px;
+  width: 310px;
 }
 
 .name {
@@ -305,11 +363,13 @@ function drop(event) {
   var node = document.getElementById(id);
   var att = document.createAttribute("state");
   var target = event.target;
- 
-  if (state == "card") {
-	state = event.target.parentNode.getAttribute("class");
-	target = event.target.parentNode;
+  console.log(state);
+  while (state != "cardlist") {
+	target = target.parentNode;
+	state = target.getAttribute("class");
+	console.log(state);
   }
+  state = target.getAttribute("id");
   if (state == node.getAttribute("state")) {
 	return;
   }
@@ -332,9 +392,6 @@ function drop(event) {
   postUpdate(id,state);
 }
 
-function findState(target) {
-
-}
 
 function cardClick(card) {
   var cards = document.getElementsByClassName("card");
@@ -381,35 +438,38 @@ function newCard() {
 	elm.setAttributeNode(att);
 	node.appendChild(elm);
 	document.getElementById("backlog").appendChild(node);
+	cardClick(node);
 }
 
 </script>
 
+<template>
+	
+</template>
 
 <body onLoad="getTickets()">
 
-
-<h1>Kanban Challenge</h1>
+<div class="header">
+	<h1>Kanban Challenge</h1>
+</div>
 
 <div class="grid-container">
   <div class="heads">
-	<div class="backlog">
-      <div class="name">Backlog</div> 
-      </div>
-	<div class="inprogress">
-      <div class="name">In Progress</div> 
-      </div>
-	<div class="complete">
-      <div class="name">Complete</div> 
-      </div>
+	<div class="backlog">Backlog</div>
+	<div class="inprogress">In Progress</div>
+	<div class="complete">Complete</div>
   </div> 
   <div id="container" class="container">
 		<div class="backlog">
-			<div class="backlog cardlist" id="backlog" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
-			<button id="newticket" class="newticket" onclick="newCard()">New Ticket</button>
+			<div class="cardlist" id="backlog" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+			<button id="newticket" class="newticket" onclick="newCard()">+ Add Card</button>
 		</div>
-		<div class="inprogress" id="inprogress" ondrop="drop(event)" ondragover="allowDrop(event)"> </div>
-		<div class="complete" id="complete" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+		<div class="inprogress">
+			<div class="cardlist" id="inprogress" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+		</div>
+		<div class="complete">
+			<div class="cardlist" id="complete" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+		</div>
   </div>  
 </div>
 
