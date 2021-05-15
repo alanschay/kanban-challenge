@@ -3,7 +3,7 @@ Coding challenge for lightfeather.io
 
 While a proper installion of this project would require configuring a web server for access, along with reverse-proxy to the flask app, using it locally is straightforward and can be done with only a web browser, python3, and pip. Assuming those requirements are met, the process to test the page and service are as follows:
 
-The server requires flask, and flask-cors, and needs to have some environmental variables set. Put main.py and conf.json in the same directory, open your shell, and enter the following <assuming you're on Windows):
+The server requires flask, and flask-cors, and needs to have some environmental variables set. Put main.py and conf.json in the same directory, open your shell, and enter the following (assuming you're on Windows):
 
   pip install flask
   
