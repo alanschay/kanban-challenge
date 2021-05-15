@@ -1,7 +1,7 @@
 import os,json,uuid,sys
 from datetime import datetime
 from flask import Flask
-from flask import request,session,redirect,url_for,escape,send_from_directory,render_template
+from flask import request
 from flask_cors import CORS
 
 
@@ -56,12 +56,10 @@ db = json.loads(clean)
 f.close()
 
 
-print(db)
 
 @app.route('/api/kanban',methods=['GET', 'POST', 'PUT'])
 def kanban_request():
     res = {}
-    print(request.get_data())
     if request.method == 'GET':
         return json.dumps(db,sort_keys=sort_keys, indent=indent) # This part of the spec is a little vague, so I just went for a json response
         
