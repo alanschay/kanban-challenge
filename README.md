@@ -6,9 +6,11 @@ While a proper installion of this project would require configuring a web server
 The server requires flask, and flask-cors, and needs to have some environmental variables set. Put main.py and conf.json in the same directory, open your shell, and enter the following <assuming you're on Windows):
 
   pip install flask
+  
   pip install flask-cors
 
   set FLASK_APP=main
+  
   set FLASK_RUN_PORT=23456
 
   flask run
