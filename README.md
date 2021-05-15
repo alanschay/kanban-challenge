@@ -22,3 +22,5 @@ To be totally honest, I've never written javascript from scratch before, and I h
 Frankly, I think I'm going to go back in and try to refactor this into something less... disgusting to try and earn some brownie points.
 
 I hope that this work is acceptable, look forward to the opportunity to speak in the future.
+
+UPDATE: I've implemented all of the optional requirements besides the automated task creation.
