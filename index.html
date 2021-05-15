@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+.grid-container {
+  display: grid;
+  grid-template-columns:auto;
+  grid-gap: 10px;
+  background-color: #ffffff;
+  padding: 10px;
+}
+
+.grid-container > div {
+  text-align: center;
+  padding: 16px;
+  font-size: 30px;
+}
+
+.container {
+display: grid;
+grid-template-columns: auto auto auto;
+grid-auto-rows: minmax(auto, auto);
+grid-gap: 80px;
+}
+
+.container > div {
+border: #000 1px solid;
+padding: 16px;
+width: 368px;
+}
+
+.heads {
+display: grid;
+grid-template-columns: auto auto auto;
+grid-auto-rows: minmax(70px, auto);
+grid-gap: 80px;
+}
+
+.heads > div {
+border: #000 1px solid;
+padding: 16px;
+width: 368px;
+}
+
+.cardlist {
+  position: relative;
+  overflow-y: scroll;
+  max-height: 300px;
+}
+
+
+.backlog {
+  background-color: #ff0000;
+  height: inherit;
+  width: inherit;
+}
+
+.newticket {
+  position: absolute
+  bottom: 0px;
+  align: center;
+  border: #000 0px solid;
+  color: white;
+  background-color: #ff0000;
+  font-size: 30px;
+}
+.inprogress {
+  background-color: #808080;
+  height: inherit;
+  width: inherit;
+}
+
+.complete {
+  background-color: #0000ff;
+  height: inherit;
+  width: inherit;
+}
+
+.card {
+  border: #000 1px solid;
+  border-radius: 10px;
+  background-color: #ffffff;
+  margin: 16px;
+  height: 155px;
+  width: 330px;
+  position: relative;
+}
+
+.card > .description {
+  align:center;
+}
+
+.card > .moveright {
+  position: absolute;
+  right: 16px;
+  top: 75px;
+  border-radius: 50%;
+}
+
+.card > .moveleft {
+  position: absolute;
+  left: 16px;
+  top: 75px;
+  border-radius: 50%;
+}
+
+.card > .user {
+  position: absolute;
+  bottom: 8px;
+  right: 16px;
+  font-size: 18px;
+}
+
+.card > .date {
+  position: absolute;
+  bottom: 8px;
+  left: 16px;
+  font-size: 18px;
+}
+
+.card > .bottomright {
+  position: absolute;
+  bottom: 8px;
+  right: 16px;
+  font-size: 18px;
+}
+
+.card > .bottomleft {
+  position: absolute;
+  bottom: 8px;
+  left: 16px;
+  font-size: 18px;
+}
+
+.name {
+  color: white;
+}
+
+</style>
+</head>
+<script>
+function buildCard(card) {
+	var node,textnode,att,atts,id;
+	
+	atts = ["description","user","date"];
+	for (i in atts) {
+		node = document.createElement("P");
+		textnode = document.createTextNode(card.getAttribute(atts[i]));
+		node.appendChild(textnode);
+		att = document.createAttribute("class");
+		att.value = atts[i];
+		node.setAttributeNode(att);
+		card.appendChild(node);
+	}
+	node = document.createElement("BUTTON");
+	textnode = document.createTextNode("<");
+	node.appendChild(textnode);
+	att = document.createAttribute("class");
+	att.value = "moveleft";
+	node.setAttributeNode(att);
+	att = document.createAttribute("onclick");
+	att.value = "moveLeft(this.parentNode)";
+	node.setAttributeNode(att);
+	if (card.getAttribute("state") == "backlog") {
+		node.style.visibility = "hidden";
+	}
+	card.appendChild(node);
+	node = document.createElement("BUTTON");
+	textnode = document.createTextNode(">");
+	node.appendChild(textnode);
+	att = document.createAttribute("class");
+	att.value = "moveright";
+	node.setAttributeNode(att);
+	att = document.createAttribute("onclick");
+	att.value = "moveRight(this.parentNode)";
+	node.setAttributeNode(att);
+	if (card.getAttribute("state") == "complete") {
+		node.style.visibility = "hidden";
+	}
+	card.appendChild(node);
+}
+
+async function getTickets() {
+	let url = "http://127.0.0.1:23456/api/kanban"
+
+	let response = await fetch(url);
+
+	let json = await response.json();
+	
+	return json;
+}
+
+getTickets().then(
+	function(value) {ticketParser(value);}
+);
+
+function moveLeft(ticket) {
+	var target;
+	switch (ticket.getAttribute("state")) {
+		case "inprogress" :
+			target = "backlog";
+			break;
+		case "complete" :
+			target = "inprogress";
+			break;
+	}
+	moveTicket(ticket.getAttribute("id"), target);
+}
+
+function moveRight(ticket) {
+	var target;
+	switch (ticket.getAttribute("state")) {
+		case "inprogress" :
+			target = "complete";
+			break;
+		case "backlog" :
+			target = "inprogress";
+			break;
+	}
+	moveTicket(ticket.getAttribute("id"), target);
+}
+
+function ticketParser(json) {
+	var node,textnode,att,state,btn,atts,vals;
+	vals = ["card", "true", "dragStart(event)", "cardClick(this)"];
+	for (item in json["tickets"]) {
+	  node = document.createElement("DIV");
+	  atts = ["description", "user", "date","state"];
+	  for (i in atts) {
+		att = document.createAttribute(atts[i]);
+		att.value = json["tickets"][item][atts[i]];
+		node.setAttributeNode(att);
+	  }
+	  atts = ["class", "draggable", "ondragstart", "onclick"];
+	  for (i in atts) {
+		att = document.createAttribute(atts[i]);
+		att.value = [vals[i]];
+		node.setAttributeNode(att);
+	  }
+	  att = document.createAttribute("id");
+	  att.value = json["tickets"][item]["uuid"];
+	  node.setAttributeNode(att);
+	  state = json["tickets"][item]["state"];
+	  document.getElementById(state).appendChild(node);
+	  buildCard(node);
+	}
+}
+
+
+function moveTicket(id, state) {
+	var node = document.getElementById(id).cloneNode();
+    var att = document.createAttribute("state");
+	att.value = state;
+	node.setAttributeNode(att);
+	document.getElementById(id).remove();
+	document.getElementById(state).appendChild(node);
+	buildCard(node);
+	postUpdate(id, state);
+}
+
+async function postUpdate(id, state) {	
+	let url = "http://127.0.0.1:23456/api/kanban";
+	
+	let formData = new FormData();
+	formData.append('uuid',id);
+	formData.append('state',state);
+	
+	let response = await fetch(url, {
+	method: 'POST',
+	body: formData
+	});
+	
+	let result = await response.json();
+}
+
+async function putNew(user, description) {	
+	let url = "http://127.0.0.1:23456/api/kanban";
+	
+	let formData = new FormData();
+	formData.append('user',user);
+	formData.append('description',description);
+	
+	let response = await fetch(url, {
+	method: 'PUT',
+	body: formData
+	});
+	
+	window.location.reload(true);
+}
+
+
+function dragStart(event) {
+  event.dataTransfer.setData("Text", event.target.id);
+  cardClick(event.target)
+}
+
+function allowDrop(event) {
+  event.preventDefault();
+}
+
+function drop(event) {
+  event.preventDefault();
+  var id = event.dataTransfer.getData("Text");
+  var state = event.target.getAttribute("class");
+  var node = document.getElementById(id);
+  var att = document.createAttribute("state");
+  var target = event.target;
+ 
+  if (state == "card") {
+	state = event.target.parentNode.getAttribute("class");
+	target = event.target.parentNode;
+  }
+  if (state == node.getAttribute("state")) {
+	return;
+  }
+  if (state == "backlog") {
+		node.getElementsByClassName("moveleft")[0].style.visibility = "hidden";
+		node.getElementsByClassName("moveright")[0].style.visibility = "visible";
+  }
+  if (state == "complete") {
+		node.getElementsByClassName("moveright")[0].style.visibility = "hidden";
+		node.getElementsByClassName("moveleft")[0].style.visibility = "visible";
+  }
+  if (state == "inprogress") {
+		node.getElementsByClassName("moveleft")[0].style.visibility = "visible";
+		node.getElementsByClassName("moveright")[0].style.visibility = "visible";
+  }
+  att.value = state;
+  node.setAttributeNode(att);
+  target.appendChild(node);
+  
+  postUpdate(id,state);
+}
+
+function findState(target) {
+
+}
+
+function cardClick(card) {
+  var cards = document.getElementsByClassName("card");
+  var i;
+  for (i = 0; i < cards.length; i++) {
+	cards[i].style.border ="#000000 1px solid";
+  }
+  card.style.border ="#ff0000 4px solid";
+}
+
+function newCard() {
+	var node, elm, textnode, att;
+	document.getElementById("newticket").disabled = true;
+	node = document.createElement("DIV");
+	att = document.createAttribute("class");
+	att.value = "card";
+	node.setAttributeNode(att);
+	att = document.createAttribute("id");
+	att.value = "newcard";
+	node.setAttributeNode(att);
+	elm = document.createElement("TEXTAREA");
+	att = document.createAttribute("id");
+	att.value = "newdesc";
+	elm.setAttributeNode(att);
+	att = document.createAttribute("class");
+	att.value = "description";
+	elm.setAttributeNode(att);
+	node.appendChild(elm);
+	elm = document.createElement("P");
+	textnode = document.createTextNode("Creating...");
+	elm.appendChild(textnode);
+	att = document.createAttribute("class");
+	att.value = "bottomleft";
+	elm.setAttributeNode(att);
+	node.appendChild(elm);
+	elm = document.createElement("BUTTON");
+	textnode = document.createTextNode("Done");
+	elm.appendChild(textnode);
+	att = document.createAttribute("class");
+	att.value = "bottomright";
+	elm.setAttributeNode(att);
+	att = document.createAttribute("onclick");
+	att.value = "putNew('Alan',document.getElementById('newdesc').value)";
+	elm.setAttributeNode(att);
+	node.appendChild(elm);
+	document.getElementById("backlog").appendChild(node);
+}
+
+</script>
+
+
+<body onLoad="getTickets()">
+
+
+<h1>Kanban Challenge</h1>
+
+<div class="grid-container">
+  <div class="heads">
+	<div class="backlog">
+      <div class="name">Backlog</div> 
+      </div>
+	<div class="inprogress">
+      <div class="name">In Progress</div> 
+      </div>
+	<div class="complete">
+      <div class="name">Complete</div> 
+      </div>
+  </div> 
+  <div id="container" class="container">
+		<div class="backlog">
+			<div class="backlog cardlist" id="backlog" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+			<button id="newticket" class="newticket" onclick="newCard()">New Ticket</button>
+		</div>
+		<div class="inprogress" id="inprogress" ondrop="drop(event)" ondragover="allowDrop(event)"> </div>
+		<div class="complete" id="complete" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+  </div>  
+</div>
+
+</body>
+</html>
